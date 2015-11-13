@@ -37,7 +37,7 @@ Window {
 
     ComboBox {
         id: dropdown
-        width: 240
+        width: 400
         x: margin
         anchors.top: isoPath.bottom
         anchors.topMargin: margin
@@ -64,7 +64,7 @@ Window {
         anchors.top: dropdown.bottom
         anchors.topMargin: margin
         onClicked: {
-            b.createUsb(isoPath.text, dropdown.currentText)
+            b.createUsb(isoPath.text, dropdown.currentIndex)
         }
     }
 

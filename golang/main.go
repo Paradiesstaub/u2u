@@ -29,6 +29,7 @@ func run() error {
 		iso.NewDummyWriterLinux(root.NewExecutor()),
 		//iso.FakeWriter{},
 		b,
+		NewModel(),
 	)
 	b.Window.Show()
 	b.Window.Wait()
@@ -53,8 +54,8 @@ func NewBridge(component qml.Object) Bridge {
 }
 
 // CreateUsb writes the passed iso to the device.
-func (b *Bridge) CreateUsb(iso, device string) {
-	controler.CreateUsb(iso, device)
+func (b *Bridge) CreateUsb(iso string, dropdownIndex int) {
+	controler.CreateUsb(iso, dropdownIndex)
 }
 
 // CheckShowRunButton checks if the run button should be displayed in QML.

@@ -3,6 +3,7 @@ package iso
 import (
 	"fmt"
 	"log"
+	"os/exec"
 	"strings"
 
 	"github.com/Paradiesstaub/u2u/golang/root"
@@ -42,9 +43,14 @@ func (w DummyWriterLinux) Write(iso, device string) {
 	if !strings.HasPrefix(device, "/dev/") {
 		log.Fatalln("Passed device path has to start with '/dev/'")
 	}
+	// call dd
 	e := w.executor
-	cmd := fmt.Sprintf("dd bs=4M if=%s of=%s && sync", iso, device)
-	msg := fmt.Sprintf("Write ISO to USB stick (%s).", device)
+	cmd := fmt.Sprintf("dd bs=32M if=%s of=%s && sync", iso, device)
+	msg := fmt.Sprintf("Write ISO to USB Stick (%s).", device)
 	e.Exec(cmd, msg)
-	fmt.Printf("DONE - ISO written to %s!\n", device)
+	// call sync
+	if err := exec.Command("sync").Run(); err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Printf("DONE - ISO written to %s\n", device)
 }

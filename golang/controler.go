@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Paradiesstaub/u2u/golang/iso"
+	"github.com/Paradiesstaub/u2u/golang/usb"
 )
 
 // Controler handels the input events of the main view.
@@ -14,22 +15,9 @@ type Controler struct {
 	model  *Model
 }
 
-// Model object of main.
-type Model struct {
-	dropdownList []string
-}
-
-const defaultDropdownEntry = "No USB drive found"
-
 // NewControler creates a new controler for the main view.
-func NewControler(w iso.Writer, v View) *Controler {
-	m := &Model{
-		dropdownList: []string{defaultDropdownEntry},
-	}
-	// setup dropw-down
-	device := "/dev/sdc" // TODO remove
-	m.dropdownList = []string{device}
-	v.SetDropdownItems(m.dropdownList)
+func NewControler(w iso.Writer, v View, m *Model) *Controler {
+	v.SetDropdownItems(m.DropwdownList())
 	return &Controler{
 		view:   &v,
 		writer: w,
@@ -47,16 +35,20 @@ func (c *Controler) CheckShowRunButton(iso string) bool {
 		return false
 	}
 	// check if default entry is still used
-	dd := c.model.dropdownList
-	if len(dd) == 1 && dd[0] == defaultDropdownEntry {
+	if len(c.model.devices) == 0 {
 		return false
 	}
 	return true
 }
 
+func (c *Controler) deviceByIndex(index int) usb.Device {
+	return c.model.devices[index]
+}
+
 // CreateUsb handels the usb creation.
-func (c *Controler) CreateUsb(iso, device string) {
-	c.writer.Write(iso, device)
+func (c *Controler) CreateUsb(iso string, dropdownIndex int) {
+	d := c.deviceByIndex(dropdownIndex)
+	c.writer.Write(iso, d.Path)
 }
 
 // Quit terminates the program.
