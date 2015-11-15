@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"teststuff/isocreator/golang/root"
+
+	"github.com/Paradiesstaub/u2u/golang/root"
 )
 
 // Writer handels platform independent writing of an ISO file to USB.

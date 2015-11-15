@@ -2,7 +2,8 @@ package main
 
 import (
 	"os"
-	"teststuff/isocreator/golang/iso"
+
+	"github.com/Paradiesstaub/u2u/golang/iso"
 )
 
 // Controler handels the input events of the main view.
