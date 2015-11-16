@@ -1,6 +1,6 @@
-import QtQuick 2.4
-import QtQuick.Window 2.2
-import QtQuick.Controls 1.3
+import QtQuick 2.2
+import QtQuick.Window 2.0
+import QtQuick.Controls 1.1
 
 // widget doc: http://doc.qt.io/qt-5/qtquickcontrols-index.html
 
