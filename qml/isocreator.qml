@@ -13,7 +13,8 @@ Window {
     /*
     MouseArea {
         anchors.fill: parent
-        onClicked: ctrl.quit()
+        //onClicked: Qt.quit()
+        onClicked: b.quit()
     }
     */
 
@@ -23,6 +24,7 @@ Window {
         y: margin
         text: "Create USB Start-Up Disk."
     }
+
     TextField {
         id: isoPath
         width: 400
@@ -33,18 +35,25 @@ Window {
         onTextChanged: runButtonVisibilityCheck()
     }
 
-    TextField {
-        id: devicePath
+    ComboBox {
+        id: dropdown
         width: 240
         x: margin
         anchors.top: isoPath.bottom
         anchors.topMargin: margin
-        placeholderText: "path to the device, e.g: /dev/sdc"
-        onTextChanged: runButtonVisibilityCheck()
+        onCurrentIndexChanged: {
+            // ignore initial event when widget is setup
+            if (currentText !== "") {
+                runButtonVisibilityCheck()
+            }
+        }
     }
 
-    function runButtonVisibilityCheck() {
-        btn.visible = isoPath.text.length > 0 && devicePath.text.length > 0
+    // setDropdownItems gets a string passed as argument containing
+    // a string-array (items are separated by ':'). The array is
+    // than assigned to the ComboBox as model.
+    function setDropdownItems(arr) {
+        dropdown.model = arr.split(":")
     }
 
     Button {
@@ -52,10 +61,14 @@ Window {
         visible: false
         text: "Run"
         x: margin
-        anchors.top: devicePath.bottom
+        anchors.top: dropdown.bottom
         anchors.topMargin: margin
         onClicked: {
-            ctrl.createUsb(isoPath.text, devicePath.text)
+            b.createUsb(isoPath.text, dropdown.currentText)
         }
+    }
+
+    function runButtonVisibilityCheck() {
+        btn.visible = b.checkShowRunButton(isoPath.text)
     }
 }
