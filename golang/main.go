@@ -2,8 +2,7 @@ package main
 
 import (
 	"log"
-	"teststuff/isocreator/golang/root"
-
+	"github.com/Paradiesstaub/u2u/golang/root"
 	"github.com/Paradiesstaub/u2u/golang/iso"
 	"gopkg.in/qml.v1"
 )

@@ -37,7 +37,7 @@ Add the following lines to the .profile file:
 
 Logout of your current shell session and back again or reboot the computer. Finally check if go was successfully installed:
 
-    go version # should return 1.5.1
+    go version # should return 1.5.2
 
 
 ### 3. Setup go-qml and get the ubuntu2usb code
