@@ -41,14 +41,14 @@ func (c *Controler) CheckShowRunButton(iso string) bool {
 	return true
 }
 
-func (c *Controler) deviceByIndex(index int) usb.Device {
+func (c *Controler) deviceByIndex(index int) usb.Devicer {
 	return c.model.devices[index]
 }
 
 // CreateUsb handels the usb creation.
 func (c *Controler) CreateUsb(iso string, dropdownIndex int) {
 	d := c.deviceByIndex(dropdownIndex)
-	c.writer.Write(iso, d.Path)
+	c.writer.Write(iso, d.Path())
 }
 
 // Quit terminates the program.

@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"github.com/Paradiesstaub/u2u/golang/root"
+
 	"github.com/Paradiesstaub/u2u/golang/iso"
 	"gopkg.in/qml.v1"
 )
@@ -25,7 +25,7 @@ func run() error {
 	b := NewBridge(component)
 	engine.Context().SetVar("b", &b)
 	controler = NewControler(
-		iso.NewDummyWriterLinux(root.NewExecutor()),
+		iso.NewWriter(),
 		//iso.FakeWriter{},
 		b,
 		NewModel(),

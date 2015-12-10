@@ -9,27 +9,33 @@ import (
 	"strings"
 )
 
+type linuxDevice struct {
+	vendor    string
+	model     string
+	path      string
+	sectors   int
+	blockSize int
+	writable  bool
+	removable bool
+	// uuid string // TODO
+}
+
 // List returns a slice of writable and removable USB devices.
-// Or an empty slice if no device could be found or an error occurred.
-func List() []Device {
+func List() []Devicer {
 	arr := FindDevices()
 	if len(arr) == 0 {
-		return make([]Device, 0)
+		return make([]Devicer, 0)
 	}
-	var devices []Device
+	var devices []Devicer
 	for _, p := range arr {
 		d, err := info(p)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		if !d.Writable {
-			continue
+		if err := d.check(); err == nil {
+			devices = append(devices, Devicer(&d))
 		}
-		if !d.Removable {
-			continue
-		}
-		devices = append(devices, d)
 	}
 	return devices
 }
@@ -69,7 +75,7 @@ func FindDevices() []string {
 }
 
 // info returns a Device model for the device path p.
-func info(p string) (Device, error) {
+func info(p string) (linuxDevice, error) {
 	b := filepath.Base(p)
 	vendor := readFile(fmt.Sprintf("/sys/block/%s/device/vendor", b))
 	model := readFile(fmt.Sprintf("/sys/block/%s/device/model", b))
@@ -78,20 +84,20 @@ func info(p string) (Device, error) {
 	bSize, err := intFromFile(
 		fmt.Sprintf("/sys/block/%s/queue/physical_block_size", b))
 	if err != nil {
-		return Device{}, fmt.Errorf("E: Couldn't convert '%v' to int.", bSize)
+		return linuxDevice{}, fmt.Errorf("E: Could not convert '%v' to int.", bSize)
 	}
 	sectors, err := intFromFile(fmt.Sprintf("/sys/block/%s/size", b))
 	if err != nil {
-		return Device{}, fmt.Errorf("E: Couldn't convert '%v' to int.", sectors)
+		return linuxDevice{}, fmt.Errorf("E: Could not convert '%v' to int.", sectors)
 	}
-	return Device{
-		Vendor:    vendor,
-		Model:     model,
-		Path:      p,
-		Sectors:   sectors,
-		BlockSize: bSize,
-		Writable:  ro == "0",
-		Removable: removable == "1",
+	return linuxDevice{
+		vendor:    vendor,
+		model:     model,
+		path:      p,
+		sectors:   sectors,
+		blockSize: bSize,
+		writable:  ro == "0",
+		removable: removable == "1",
 	}, nil
 }
 
@@ -132,4 +138,35 @@ func pathByDeviceID(e string) string {
 		return ""
 	}
 	return fmt.Sprintf("/dev/%s", filepath.Base(s))
+}
+
+// check if device is readable & writable.
+func (d *linuxDevice) check() error {
+	switch {
+	case len(d.path) == 0:
+		return ErrPathEmpty
+	case d.sectors <= 0:
+		return ErrSectorEmpty
+	case d.blockSize <= 0:
+		return ErrBlocksizeEmpty
+	case !d.writable:
+		return ErrNotWritable
+	case !d.removable:
+		return ErrNotRemovable
+		// case len(d.UUID) == 0: // TODO implement UUID on Linux and uc check
+		// 	return ErrNoUUID
+	}
+	return nil
+}
+
+func (d *linuxDevice) Vendor() string     { return d.vendor }
+func (d *linuxDevice) Model() string      { return d.model }
+func (d *linuxDevice) Path() string       { return d.path }
+func (d *linuxDevice) Sectors() int       { return d.sectors }
+func (d *linuxDevice) BlockSize() int     { return d.blockSize }
+func (d *linuxDevice) IsSameDevice() bool { return true } // TODO
+func (d *linuxDevice) Unmount() error     { return nil }  // TODO
+
+func (d *linuxDevice) Size() int {
+	return d.sectors * d.blockSize
 }
