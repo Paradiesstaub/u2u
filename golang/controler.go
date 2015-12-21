@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -47,8 +48,16 @@ func (c *Controler) deviceByIndex(index int) usb.Devicer {
 
 // CreateUsb handels the usb creation.
 func (c *Controler) CreateUsb(iso string, dropdownIndex int) {
-	d := c.deviceByIndex(dropdownIndex)
-	c.writer.Write(iso, d.Path())
+	device := c.deviceByIndex(dropdownIndex)
+	// check that hardware pointed to by the device path hasn't changed.
+	if !device.IsSameDevice() {
+		log.Fatal("E: CreateUsb - Not same device!") // TODO show error to user
+	}
+	// unmount all device partitions
+	if err := device.Unmount(); err != nil {
+		log.Fatal("E: ", err.Error()) // TODO show error to user
+	}
+	c.writer.Write(iso, device.Path())
 }
 
 // Quit terminates the program.

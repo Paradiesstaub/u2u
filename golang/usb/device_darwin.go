@@ -226,12 +226,8 @@ func (d *macDevice) Unmount() error {
 	if !d.isMounted() {
 		return nil
 	}
-	cmd := fmt.Sprintf("diskutil umount %s", d.Path)
+	cmd := fmt.Sprintf("diskutil umount %s", d.path)
 	return exec.Command("sh", "-c", cmd).Run()
-}
-
-func (d *macDevice) Size() int {
-	return d.sectors * d.blockSize
 }
 
 // system_profiler SPUSBDataType -xml
